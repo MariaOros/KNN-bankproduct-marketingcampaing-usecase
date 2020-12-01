@@ -171,6 +171,3 @@ def main():
     
     #KNN choise for first classification approach
     model(bank_final, y)
-
-
-main()
