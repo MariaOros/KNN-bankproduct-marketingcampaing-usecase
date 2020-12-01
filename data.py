@@ -33,17 +33,17 @@ logger.setLevel(logging.INFO)
 def variables_treatment(bank_aditional):
     '''
         VARIABLES TREATMENT
-        Categorize and Normalize variables for standard values and knn usage
+        Categorize by labeled encoded and Normalize variables for standard values and knn usage
     '''
 
     '''
-            About the client: categorical and dummies treatment
+            About the client
     '''
 
     bank_client = bank_aditional.iloc[: , 0:8]
     bank_client.keys()
 
-    #Label class for all categorical related to person
+    #Label class for all categorical related to person by labeled encoded tool
     labelencoder_X = LabelEncoder()
     bank_client['job'] = labelencoder_X.fit_transform(bank_client['job'])
     bank_client['marital'] = labelencoder_X.fit_transform(bank_client['marital'])
@@ -52,16 +52,15 @@ def variables_treatment(bank_aditional):
     bank_client['housing'] = labelencoder_X.fit_transform(bank_client['housing'])
     bank_client['loan'] = labelencoder_X.fit_transform(bank_client['loan'])
 
-    # function to creat group of ages as cathegorical tag. Percentile helps to define 4 groups
+    # function to creat group of ages as cathegorical tag. Percentile helps to define 4 groups, the last one where outliers
     bank_client.loc[bank_client['age'] <= 32, 'age'] = 1
     bank_client.loc[(bank_client['age'] > 32) & (bank_client['age'] <= 47), 'age'] = 2
     bank_client.loc[(bank_client['age'] > 47) & (bank_client['age'] <= 74), 'age'] = 3
 
     '''
-                About the campaing data: categorical and dummies treatment
+                About the campaing data: categorical by labeled enconded treatement
     '''
     bank_related = bank_aditional.iloc[:, 8:11]
-    bank_related.head()
     bank_related['contact'] = labelencoder_X.fit_transform(bank_related['contact'])
     bank_related['month'] = labelencoder_X.fit_transform(bank_related['month'])
     bank_related['day'] = labelencoder_X.fit_transform(bank_related['day'])
@@ -75,11 +74,10 @@ def variables_treatment(bank_aditional):
 
 
 
-    bank_o = bank_aditional.loc[:, ['campaign', 'pdays', 'previous', 'poutcome']]
-    bank_o.head()
-    bank_o['poutcome'].replace(['unknown', 'failure', 'success','other'], [1, 2, 3,1], inplace=True)
+    bank_extra = bank_aditional.loc[:, ['campaign', 'pdays', 'previous', 'poutcome']]
+    bank_extra['poutcome'].replace(['unknown', 'failure', 'success','other'], [1, 2, 3,1], inplace=True)
 
-    return bank_client, bank_related, bank_o
+    return bank_client, bank_related, bank_extra
 
 
 def model(bank_final, y):
@@ -155,23 +153,23 @@ def model(bank_final, y):
 
 def main():
     '''
-            SOURCE
+            SOURCE bank-full
     '''
-    #bank_aditional = pd.read_csv('bank-additional/bank-additional-full.csv', sep=';')
-    #bank_aditional.info()
-    bank_full = pd.read_csv('bank/bank-full.csv', sep=';')
+    bank_full = pd.read_csv('bank-full.csv', sep=';')
     bank_full.info()
-
+    #cleaning outliers in balance and age dimensions
     bank_full = bank_full[bank_full['age'] < 74]
     bank_full = bank_full[bank_full['balance'] < 40060]
 
-    # Converting dependent variable as standar cat by dummy
+    # Building dependent variable as standar cat by dummy
     y = pd.get_dummies(bank_full['y'], columns=['y'], prefix=['y'], drop_first=True)
 
-    # Converting independent variables to class in variables treatment
-    bank_client, bank_related, bank_o = variables_treatment(bank_full)
-    bank_final= pd.concat([bank_client, bank_related, bank_o], axis = 1)
+    # Building independent variables to class in variables treatment function
+    bank_client, bank_related, bank_extra = variables_treatment(bank_full)
+    bank_final= pd.concat([bank_client, bank_related, bank_extra], axis = 1)
     logger.info(f'''DF keys {bank_final.keys()}''')
+    
+    #KNN choise for first classification approach
     model(bank_final, y)
 
 
