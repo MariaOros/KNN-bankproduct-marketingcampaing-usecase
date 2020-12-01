@@ -61,24 +61,16 @@ def variables_treatment(bank_aditional):
     '''
                 About the campaing data: categorical by labeled enconded treatement
     '''
-    bank_related = bank_aditional.iloc[:, 8:11]
-    bank_related['contact'] = labelencoder_X.fit_transform(bank_related['contact'])
-    bank_related['month'] = labelencoder_X.fit_transform(bank_related['month'])
-    bank_related['day'] = labelencoder_X.fit_transform(bank_related['day'])
-
-
-    '''
-        Personla economical behavior and poutcome
-    '''
-    #bank_se = bank_aditional.loc[:, ['emp.var.rate', 'cons.price.idx', 'cons.conf.idx', 'euribor3m', 'nr.employed']]
-    #bank_se.head()
-
+    bank_campaing_related = bank_aditional.iloc[:, 8:11]
+    bank_campaing_related['contact'] = labelencoder_X.fit_transform(bank_campaing_related['contact'])
+    bank_campaing_related['month'] = labelencoder_X.fit_transform(bank_campaing_related['month'])
+    bank_campaing_related['day'] = labelencoder_X.fit_transform(bank_campaing_related['day'])
 
 
     bank_extra = bank_aditional.loc[:, ['campaign', 'pdays', 'previous', 'poutcome']]
-    bank_extra['poutcome'].replace(['unknown', 'failure', 'success','other'], [1, 2, 3,1], inplace=True)
+    bank_extra['poutcome'].replace(['unknown', 'failure', 'success','other'], [1, 2, 3,0], inplace=True)
 
-    return bank_client, bank_related, bank_extra
+    return bank_client, bank_campaing_related, bank_extra
 
 
 def model(bank_final, y):
