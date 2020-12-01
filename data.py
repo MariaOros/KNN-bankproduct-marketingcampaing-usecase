@@ -17,6 +17,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.metrics import confusion_matrix, accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
+from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
 from sklearn import model_selection
 from sklearn.neighbors import KNeighborsClassifier
@@ -148,7 +149,7 @@ def model(bank_final, y):
         ax_arr[0, 2].set_xlabel('False Positive Rate', fontsize=15)
         ax_arr[0, 2].legend(loc='lower right', prop={'size': 16})
     except Exception as e:
-        loggr.error(f'''{e}''')
+        logger.error(f'''{e}''')
 
 
 def main():
